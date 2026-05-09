@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wanderlust – Plan Your Dream Journey</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Google Fonts: Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+  <!-- ============ NAV ============ -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-brand">
+      <i class="fas fa-compass nav-icon"></i>
+      <span>Wanderlust</span>
+    </div>
+    <div class="nav-right">
+      <ul class="nav-links">
+        <li><a href="#destinations">Destinations</a></li>
+        <li><a href="#planner">Planner</a></li>
+        <li><a href="#weather">Weather</a></li>
+        <li><a href="planner.html" class="btn-nav" id="buildItineraryLink">Build Itinerary</a></li>
+      </ul>
+      <div id="navUserArea">
+        <button class="btn-login" id="loginNavBtn"><i class="fas fa-user"></i> Login</button>
+      </div>
+    </div>
+    <button class="nav-hamburger" id="hamburger"><i class="fas fa-bars"></i></button>
+  </nav>
+
+  <!-- ============ AUTH MODAL ============ -->
+  <div class="modal-overlay" id="authModal">
+    <div class="modal auth-modal glass">
+      <button class="modal-close auth-modal-close" id="closeAuthModal"><i class="fas fa-times"></i></button>
+
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login"><i class="fas fa-sign-in-alt"></i> Login</button>
+        <button class="auth-tab" data-tab="signup"><i class="fas fa-user-plus"></i> Sign Up</button>
+      </div>
+
+      <!-- Login Form -->
+      <div class="auth-form" id="loginForm">
+        <div class="auth-header">
+          <div class="auth-icon"><i class="fas fa-compass"></i></div>
+          <h3>Welcome Back</h3>
+          <p>Login to save your itineraries & unlock all features</p>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-envelope"></i> Email</label>
+          <input type="email" id="loginEmail" placeholder="you@email.com" />
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-lock"></i> Password</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" />
+        </div>
+        <div id="loginError" class="auth-error hidden"></div>
+        <button class="btn-primary full-btn" id="loginSubmitBtn">
+          <span class="btn-text"><i class="fas fa-sign-in-alt"></i> Login</span>
+          <span class="btn-loader hidden"><i class="fas fa-circle-notch fa-spin"></i> Logging in...</span>
+        </button>
+        <p class="auth-switch">Don't have an account? <a href="#" class="switch-to-signup">Sign up free</a></p>
+        <div class="auth-demo-hint"><i class="fas fa-info-circle"></i> Demo: demo@wanderlust.com / password</div>
+      </div>
+
+      <!-- Signup Form -->
+      <div class="auth-form hidden" id="signupForm">
+        <div class="auth-header">
+          <div class="auth-icon"><i class="fas fa-paper-plane"></i></div>
+          <h3>Create Account</h3>
+          <p>Join 50,000+ travelers planning smarter with Wanderlust</p>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-user"></i> Full Name</label>
+          <input type="text" id="signupName" placeholder="Your name" />
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-envelope"></i> Email</label>
+          <input type="email" id="signupEmail" placeholder="you@email.com" />
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-lock"></i> Password</label>
+          <input type="password" id="signupPassword" placeholder="Min 6 characters" />
+        </div>
+        <div id="signupError" class="auth-error hidden"></div>
+        <div id="signupSuccess" class="auth-success hidden"></div>
+        <button class="btn-primary full-btn" id="signupSubmitBtn">
+          <span class="btn-text"><i class="fas fa-user-plus"></i> Create Account</span>
+          <span class="btn-loader hidden"><i class="fas fa-circle-notch fa-spin"></i> Creating...</span>
+        </button>
+        <p class="auth-switch">Already have an account? <a href="#" class="switch-to-login">Login</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ AUTH GATE MODAL (for protected features) ============ -->
+  <div class="modal-overlay" id="authGateModal">
+    <div class="modal auth-modal glass" style="max-width:420px;">
+      <button class="modal-close" id="closeAuthGateModal"><i class="fas fa-times"></i></button>
+      <div class="auth-header" style="padding:2rem 2rem 1rem;">
+        <div class="auth-icon"><i class="fas fa-lock"></i></div>
+        <h3 id="authGateTitle">Login Required</h3>
+        <p id="authGateMsg">Please login or sign up to use this feature.</p>
+      </div>
+      <div style="padding:0 2rem 2rem; display:flex; gap:0.8rem;">
+        <button class="btn-primary" style="flex:1; justify-content:center;" id="authGateLoginBtn"><i class="fas fa-sign-in-alt"></i> Login</button>
+        <button class="btn-ghost" style="flex:1; justify-content:center; color:var(--blue); border-color:var(--blue);" id="authGateSignupBtn"><i class="fas fa-user-plus"></i> Sign Up</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ HERO ============ -->
+  <section class="hero" id="hero">
+    <div class="hero-bg">
+      <img src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1920&q=90&fit=crop" alt="Hero Travel" class="hero-img" />
+      <div class="hero-overlay"></div>
+    </div>
+    <div class="hero-content">
+      <span class="hero-badge"><i class="fas fa-star"></i> Premium Travel Planning</span>
+      <h1 class="hero-title">Plan Your<br/><span class="accent-text">Dream Journey</span></h1>
+      <p class="hero-sub">Discover the world's most breathtaking destinations. Build personalized itineraries, check live weather, and travel smarter.</p>
+      <div class="hero-actions">
+        <a href="#" class="btn-primary pulse-btn" id="heroPlanBtn" data-requires-auth="true" data-auth-msg="Login to start planning your dream trip!">
+          <i class="fas fa-map-marked-alt"></i> Start Planning
+        </a>
+        <a href="#destinations" class="btn-ghost">
+          <i class="fas fa-globe"></i> Explore Destinations
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><span class="stat-num">500+</span><span class="stat-label">Destinations</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><span class="stat-num">50K+</span><span class="stat-label">Happy Travelers</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><span class="stat-num">4.9★</span><span class="stat-label">User Rating</span></div>
+      </div>
+    </div>
+    <div class="hero-scroll-hint">
+      <span>Scroll to explore</span>
+      <div class="scroll-dot"></div>
+    </div>
+  </section>
+
+  <!-- ============ DESTINATIONS ============ -->
+  <section class="section destinations-section" id="destinations">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-badge">Top Picks</span>
+        <h2>Trending Destinations</h2>
+        <p>Handpicked places loved by thousands of travelers worldwide</p>
+      </div>
+      <div class="destinations-grid">
+
+        <div class="dest-card reveal" data-city="Santorini" data-country="Greece">
+          <div class="dest-img-wrap">
+            <img src="https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=800&q=85&fit=crop" alt="Santorini" />
+            <div class="dest-overlay">
+              <div class="dest-meta">
+                <h3>Santorini</h3>
+                <p><i class="fas fa-map-marker-alt"></i> Greece</p>
+              </div>
+              <a href="#planner" class="dest-cta">Plan Trip <i class="fas fa-arrow-right"></i></a>
+              <button class="dest-save-btn" title="Save to wishlist"><i class="far fa-heart"></i></button>
+            </div>
+          </div>
+          <div class="dest-info">
+            <div class="dest-tags">
+              <span class="tag">Romantic</span>
+              <span class="tag">Beach</span>
+            </div>
+            <div class="dest-price">From <strong>$1,200</strong></div>
+          </div>
+        </div>
+
+        <div class="dest-card reveal" data-city="Kyoto" data-country="Japan">
+          <div class="dest-img-wrap">
+            <img src="https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800&q=85&fit=crop" alt="Kyoto" />
+            <div class="dest-overlay">
+              <div class="dest-meta">
+                <h3>Kyoto</h3>
+                <p><i class="fas fa-map-marker-alt"></i> Japan</p>
+              </div>
+              <a href="#planner" class="dest-cta">Plan Trip <i class="fas fa-arrow-right"></i></a>
+              <button class="dest-save-btn" title="Save to wishlist"><i class="far fa-heart"></i></button>
+            </div>
+          </div>
+          <div class="dest-info">
+            <div class="dest-tags">
+              <span class="tag">Culture</span>
+              <span class="tag">History</span>
+            </div>
+            <div class="dest-price">From <strong>$1,800</strong></div>
+          </div>
+        </div>
+
+        <div class="dest-card reveal" data-city="Bali" data-country="Indonesia">
+          <div class="dest-img-wrap">
+            <img src="https://images.unsplash.com/photo-1558005137-d9619a5c539f?w=800&q=85&fit=crop" alt="Bali" />
+            <div class="dest-overlay">
+              <div class="dest-meta">
+                <h3>Bali</h3>
+                <p><i class="fas fa-map-marker-alt"></i> Indonesia</p>
+              </div>
+              <a href="#planner" class="dest-cta">Plan Trip <i class="fas fa-arrow-right"></i></a>
+              <button class="dest-save-btn" title="Save to wishlist"><i class="far fa-heart"></i></button>
+            </div>
+          </div>
+          <div class="dest-info">
+            <div class="dest-tags">
+              <span class="tag">Tropical</span>
+              <span class="tag">Spiritual</span>
+            </div>
+            <div class="dest-price">From <strong>$900</strong></div>
+          </div>
+        </div>
+
+        <div class="dest-card reveal" data-city="Paris" data-country="France">
+          <div class="dest-img-wrap">
+            <img src="https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=800&q=85&fit=crop" alt="Paris" />
+            <div class="dest-overlay">
+              <div class="dest-meta">
+                <h3>Paris</h3>
+                <p><i class="fas fa-map-marker-alt"></i> France</p>
+              </div>
+              <a href="#planner" class="dest-cta">Plan Trip <i class="fas fa-arrow-right"></i></a>
+              <button class="dest-save-btn" title="Save to wishlist"><i class="far fa-heart"></i></button>
+            </div>
+          </div>
+          <div class="dest-info">
+            <div class="dest-tags">
+              <span class="tag">Luxury</span>
+              <span class="tag">Art</span>
+            </div>
+            <div class="dest-price">From <strong>$1,500</strong></div>
+          </div>
+        </div>
+
+        <div class="dest-card reveal" data-city="Maldives" data-country="Maldives">
+          <div class="dest-img-wrap">
+            <img src="https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=85&fit=crop" alt="Maldives" />
+            <div class="dest-overlay">
+              <div class="dest-meta">
+                <h3>Maldives</h3>
+                <p><i class="fas fa-map-marker-alt"></i> Indian Ocean</p>
+              </div>
+              <a href="#planner" class="dest-cta">Plan Trip <i class="fas fa-arrow-right"></i></a>
+              <button class="dest-save-btn" title="Save to wishlist"><i class="far fa-heart"></i></button>
+            </div>
+          </div>
+          <div class="dest-info">
+            <div class="dest-tags">
+              <span class="tag">Overwater</span>
+              <span class="tag">Luxury</span>
+            </div>
+            <div class="dest-price">From <strong>$2,800</strong></div>
+          </div>
+        </div>
+
+        <div class="dest-card reveal" data-city="New York" data-country="United States">
+          <div class="dest-img-wrap">
+            <img src="https://images.unsplash.com/photo-1534430480872-3498386e7856?w=800&q=85&fit=crop" alt="New York" />
+            <div class="dest-overlay">
+              <div class="dest-meta">
+                <h3>New York</h3>
+                <p><i class="fas fa-map-marker-alt"></i> USA</p>
+              </div>
+              <a href="#planner" class="dest-cta">Plan Trip <i class="fas fa-arrow-right"></i></a>
+              <button class="dest-save-btn" title="Save to wishlist"><i class="far fa-heart"></i></button>
+            </div>
+          </div>
+          <div class="dest-info">
+            <div class="dest-tags">
+              <span class="tag">City</span>
+              <span class="tag">Culture</span>
+            </div>
+            <div class="dest-price">From <strong>$1,100</strong></div>
+          </div>
+        </div>
+
+        <div class="dest-card reveal" data-city="Dubai" data-country="United Arab Emirates">
+          <div class="dest-img-wrap">
+            <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=85&fit=crop" alt="Dubai" />
+            <div class="dest-overlay">
+              <div class="dest-meta">
+                <h3>Dubai</h3>
+                <p><i class="fas fa-map-marker-alt"></i> UAE</p>
+              </div>
+              <a href="#planner" class="dest-cta">Plan Trip <i class="fas fa-arrow-right"></i></a>
+              <button class="dest-save-btn" title="Save to wishlist"><i class="far fa-heart"></i></button>
+            </div>
+          </div>
+          <div class="dest-info">
+            <div class="dest-tags">
+              <span class="tag">Futuristic</span>
+              <span class="tag">Shopping</span>
+            </div>
+            <div class="dest-price">From <strong>$1,400</strong></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SCROLLING GALLERY STRIP ============ -->
+  <section class="gallery-strip">
+    <div class="gallery-track">
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=480&q=80&fit=crop" alt="travel" /></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1530521954074-e64f6810b32d?w=480&q=80&fit=crop" alt="travel" /></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1500835556837-99ac94a94552?w=480&q=80&fit=crop" alt="travel" /></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=480&q=80&fit=crop" alt="travel" /></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=480&q=80&fit=crop" alt="travel" /></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=480&q=80&fit=crop" alt="travel" /></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?w=480&q=80&fit=crop" alt="travel" /></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1488085061387-422e29b40080?w=480&q=80&fit=crop" alt="travel" /></div>
+      <!-- Duplicates for seamless infinite loop -->
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=480&q=80&fit=crop" alt="travel" /></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1530521954074-e64f6810b32d?w=480&q=80&fit=crop" alt="travel" /></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1500835556837-99ac94a94552?w=480&q=80&fit=crop" alt="travel" /></div>
+      <div class="gallery-item"><img src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=480&q=80&fit=crop" alt="travel" /></div>
+    </div>
+  </section>
+
+  <!-- ============ TESTIMONIALS ============ -->
+  <section class="section testimonials-section">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-badge">Travelers Love Us</span>
+        <h2>Real Stories, Real Adventures</h2>
+        <p>Thousands of travelers have planned their dream trips with Wanderlust</p>
+      </div>
+      <div class="testimonials-grid">
+        <div class="testi-card glass reveal">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-quote">"Planned my entire Santorini honeymoon in under 30 minutes. The itinerary builder is absolutely magical — every detail was perfect."</p>
+          <div class="testi-author">
+            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&q=80&fit=crop&crop=face" alt="Sarah" />
+            <div>
+              <strong>Sarah Mitchell</strong>
+              <span>Honeymooner · Santorini</span>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card glass reveal">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-quote">"The live weather feature saved our Bali trip. We knew exactly what to pack and which days to book outdoor adventures. Incredible!"</p>
+          <div class="testi-author">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&q=80&fit=crop&crop=face" alt="Marco" />
+            <div>
+              <strong>Marco Rossi</strong>
+              <span>Solo Traveler · Bali</span>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card glass reveal">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-quote">"Took our family of 5 to Japan with a full itinerary built here. The day-by-day timeline kept us perfectly organized. Kids loved it!"</p>
+          <div class="testi-author">
+            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=120&q=80&fit=crop&crop=face" alt="Priya" />
+            <div>
+              <strong>Priya Sharma</strong>
+              <span>Family Trip · Kyoto</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PLANNER FORM ============ -->
+  <section class="section planner-section" id="planner">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-badge">Plan Now</span>
+        <h2>Build Your Perfect Trip</h2>
+        <p>Fill in the details and we'll craft a personalized experience</p>
+      </div>
+      <div class="planner-card glass reveal">
+        <form id="plannerForm" novalidate>
+          <div class="form-grid">
+            <div class="form-group">
+              <label><i class="fas fa-map-marker-alt"></i> Destination</label>
+              <input type="text" id="destination" placeholder="Where do you want to go?" autocomplete="off" />
+              <span class="error-msg" id="destErr">Please enter a destination.</span>
+            </div>
+            <div class="form-group">
+              <label><i class="fas fa-calendar-alt"></i> Travel Dates</label>
+              <div class="date-row">
+                <input type="date" id="startDate" />
+                <span class="date-sep">→</span>
+                <input type="date" id="endDate" />
+              </div>
+              <span class="error-msg" id="dateErr">Please select valid dates.</span>
+            </div>
+            <div class="form-group">
+              <label><i class="fas fa-wallet"></i> Budget (USD)</label>
+              <div class="input-with-icon">
+                <span class="input-prefix">$</span>
+                <input type="number" id="budget" placeholder="5000" min="100" />
+              </div>
+              <span class="error-msg" id="budgetErr">Enter a valid budget (min $100).</span>
+            </div>
+            <div class="form-group">
+              <label><i class="fas fa-users"></i> Travelers</label>
+              <div class="traveler-picker">
+                <button type="button" class="picker-btn" id="decreaseTravelers"><i class="fas fa-minus"></i></button>
+                <span id="travelerCount">2</span>
+                <button type="button" class="picker-btn" id="increaseTravelers"><i class="fas fa-plus"></i></button>
+              </div>
+            </div>
+            <div class="form-group full-width">
+              <label><i class="fas fa-sliders-h"></i> Trip Type</label>
+              <div class="trip-type-grid">
+                <label class="trip-chip"><input type="radio" name="tripType" value="Adventure" /> <i class="fas fa-mountain"></i> Adventure</label>
+                <label class="trip-chip"><input type="radio" name="tripType" value="Romantic" /> <i class="fas fa-heart"></i> Romantic</label>
+                <label class="trip-chip"><input type="radio" name="tripType" value="Family" /> <i class="fas fa-child"></i> Family</label>
+                <label class="trip-chip"><input type="radio" name="tripType" value="Solo" /> <i class="fas fa-user"></i> Solo</label>
+                <label class="trip-chip"><input type="radio" name="tripType" value="Luxury" /> <i class="fas fa-gem"></i> Luxury</label>
+                <label class="trip-chip"><input type="radio" name="tripType" value="Budget" /> <i class="fas fa-piggy-bank"></i> Budget</label>
+              </div>
+            </div>
+          </div>
+          <div class="form-footer">
+            <button type="submit" class="btn-primary btn-large" id="planBtn">
+              <span class="btn-text"><i class="fas fa-rocket"></i> Create My Itinerary</span>
+              <span class="btn-loader hidden"><i class="fas fa-circle-notch fa-spin"></i> Planning...</span>
+            </button>
+          </div>
+        </form>
+        <div id="formSuccess" class="success-toast hidden">
+          <i class="fas fa-check-circle"></i> Your trip plan is saved! Redirecting to itinerary builder…
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WEATHER + COUNTRY ============ -->
+  <section class="section weather-section" id="weather">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-badge">Live Data</span>
+        <h2>Weather & Country Info</h2>
+        <p>Check real-time conditions before you pack your bags</p>
+      </div>
+      <div class="weather-lookup-card glass reveal">
+        <div class="weather-search-row">
+          <div class="weather-input-wrap">
+            <i class="fas fa-search"></i>
+            <input type="text" id="weatherCity" placeholder="Search a city (e.g. Paris, Bali)..." />
+          </div>
+          <button class="btn-primary" id="fetchWeatherBtn" data-requires-auth="true" data-auth-msg="Login to check live weather &amp; get AI-powered place recommendations.">
+            <i class="fas fa-cloud-sun"></i> Check Weather
+          </button>
+        </div>
+        <div id="weatherSpinner" class="spinner-wrap hidden">
+          <div class="spinner"></div>
+          <span>Fetching live data…</span>
+        </div>
+        <div id="weatherResult" class="weather-result hidden">
+          <div class="weather-card">
+            <div class="weather-header">
+              <div>
+                <h3 id="wCityName">—</h3>
+                <p id="wDesc">—</p>
+              </div>
+              <div class="weather-icon-wrap">
+                <img id="wIcon" src="" alt="weather" />
+              </div>
+            </div>
+            <div class="weather-stats-row">
+              <div class="w-stat"><i class="fas fa-thermometer-half"></i><span id="wTemp">—</span><small>Temp</small></div>
+              <div class="w-stat"><i class="fas fa-tint"></i><span id="wHumidity">—</span><small>Humidity</small></div>
+              <div class="w-stat"><i class="fas fa-wind"></i><span id="wWind">—</span><small>Wind</small></div>
+              <div class="w-stat"><i class="fas fa-eye"></i><span id="wFeelsLike">—</span><small>Feels Like</small></div>
+            </div>
+          </div>
+          <div class="country-card">
+            <div class="country-header">
+              <img id="cFlag" src="" alt="flag" class="country-flag" />
+              <div>
+                <h3 id="cName">—</h3>
+                <p id="cRegion">—</p>
+              </div>
+            </div>
+            <div class="country-facts">
+              <div class="c-fact"><i class="fas fa-users"></i><span id="cPop">—</span><small>Population</small></div>
+              <div class="c-fact"><i class="fas fa-language"></i><span id="cLang">—</span><small>Language</small></div>
+              <div class="c-fact"><i class="fas fa-coins"></i><span id="cCurrency">—</span><small>Currency</small></div>
+              <div class="c-fact"><i class="fas fa-clock"></i><span id="cTimezone">—</span><small>Timezone</small></div>
+            </div>
+          </div>
+        </div>
+        <div id="weatherError" class="weather-error hidden">
+          <i class="fas fa-exclamation-circle"></i> <span id="weatherErrorMsg">City not found. Please try again.</span>
+        </div>
+
+        <!-- Smart AI Recommendations -->
+        <div id="smartRecommendations" class="smart-recs hidden">
+          <div class="smart-recs-header">
+            <div class="smart-recs-title">
+              <i class="fas fa-magic"></i>
+              <h4>AI Smart Recommendations</h4>
+            </div>
+            <p id="smartRecsSubtitle">Places to visit based on today's weather</p>
+          </div>
+          <div id="smartRecsSpinner" class="spinner-wrap">
+            <div class="spinner"></div>
+            <span>Generating smart picks…</span>
+          </div>
+          <div id="smartRecsGrid" class="smart-recs-grid hidden"></div>
+          <div id="smartRecsTip" class="smart-recs-tip hidden"></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WHY US ============ -->
+  <section class="section features-section">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-badge">Why Wanderlust</span>
+        <h2>Everything You Need to Travel Better</h2>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card glass reveal">
+          <div class="feature-icon"><i class="fas fa-route"></i></div>
+          <h4>Smart Itineraries</h4>
+          <p>Build day-by-day travel plans with our interactive timeline builder.</p>
+        </div>
+        <div class="feature-card glass reveal">
+          <div class="feature-icon"><i class="fas fa-cloud-sun-rain"></i></div>
+          <h4>Live Weather</h4>
+          <p>Real-time conditions powered by OpenWeatherMap API.</p>
+        </div>
+        <div class="feature-card glass reveal">
+          <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+          <h4>Secure & Private</h4>
+          <p>Your plans are saved securely with encrypted user accounts.</p>
+        </div>
+        <div class="feature-card glass reveal">
+          <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
+          <h4>Works Everywhere</h4>
+          <p>Fully responsive — plan on desktop, mobile, or tablet.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CTA BANNER ============ -->
+  <section class="cta-banner">
+    <div class="cta-content reveal">
+      <h2>Ready for your next adventure?</h2>
+      <p>Join 50,000+ travelers who plan smarter with Wanderlust.</p>
+      <a href="#" class="btn-primary btn-large pulse-btn" id="ctaBuildBtn" data-requires-auth="true" data-auth-msg="Login to start building your personalized travel itinerary.">
+        <i class="fas fa-paper-plane"></i> Open Itinerary Builder
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-brand">
+        <i class="fas fa-compass"></i> <span>Wanderlust</span>
+      </div>
+      <p class="footer-tagline">Turning dream destinations into unforgettable journeys.</p>
+      <div class="footer-links">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Contact</a>
+        <a href="#">FAQ</a>
+      </div>
+      <p class="footer-copy">© 2026 Wanderlust. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- ============ NEW ITINERARY SETUP MODAL (from weather Add to Itinerary) ============ -->
+  <div class="modal-overlay" id="newItineraryModal">
+    <div class="modal glass" style="max-width:500px;">
+      <div class="modal-header">
+        <h3><i class="fas fa-map-marked-alt"></i> Create New Itinerary</h3>
+        <button class="modal-close" id="closeNewItineraryModal"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:1.2rem;">
+          You're adding <strong id="niActivityName">this activity</strong> to a new itinerary. Fill in your trip details below.
+        </p>
+        <div class="form-group">
+          <label><i class="fas fa-map-marker-alt"></i> Destination</label>
+          <input type="text" id="niDest" placeholder="e.g. Paris, France" />
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-calendar"></i> Start Date</label>
+          <input type="date" id="niStartDate" />
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-calendar-check"></i> End Date</label>
+          <input type="date" id="niEndDate" />
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-users"></i> Travelers</label>
+          <div class="traveler-picker small" style="display:flex;align-items:center;gap:0.8rem;">
+            <button type="button" class="picker-btn" id="niDecTravelers"><i class="fas fa-minus"></i></button>
+            <span id="niTravelers" style="font-weight:600;font-size:1.1rem;">2</span>
+            <button type="button" class="picker-btn" id="niIncTravelers"><i class="fas fa-plus"></i></button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-tag"></i> Trip Type</label>
+          <div class="trip-chips" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.4rem;">
+            <label class="trip-chip"><input type="radio" name="niTripType" value="Family" /> <i class="fas fa-home"></i> Family</label>
+            <label class="trip-chip"><input type="radio" name="niTripType" value="Couple" checked /> <i class="fas fa-heart"></i> Couple</label>
+            <label class="trip-chip"><input type="radio" name="niTripType" value="Solo" /> <i class="fas fa-user"></i> Solo</label>
+            <label class="trip-chip"><input type="radio" name="niTripType" value="Friends" /> <i class="fas fa-user-friends"></i> Friends</label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-ghost" id="cancelNewItinerary">Cancel</button>
+        <button class="btn-primary" id="confirmNewItinerary">
+          <i class="fas fa-arrow-right"></i> Open Builder
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

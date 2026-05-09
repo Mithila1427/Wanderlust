@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wanderlust – Itinerary Builder</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body class="planner-page">
+
+  <!-- NAV -->
+  <nav class="navbar navbar-dark" id="navbar">
+    <div class="nav-brand">
+      <i class="fas fa-compass nav-icon"></i>
+      <span>Wanderlust</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html#destinations">Destinations</a></li>
+      <li><a href="index.html#weather">Weather</a></li>
+      <li><a href="index.html" class="btn-nav">Back Home</a></li>
+    </ul>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="page-hero">
+    <div class="page-hero-content">
+      <span class="hero-badge"><i class="fas fa-map"></i> Itinerary Builder</span>
+      <h1>Build Your <span class="accent-text">Live Itinerary</span></h1>
+      <p>Drag, add, and customize your perfect day-by-day travel plan</p>
+    </div>
+    <div class="page-hero-bg">
+      <img src="https://images.unsplash.com/photo-1503220317375-aaad61436b1b?w=1400&q=85&fit=crop" alt="planning" />
+      <div class="hero-overlay"></div>
+    </div>
+  </div>
+
+  <!-- MAIN BUILDER -->
+  <main class="builder-main">
+    <div class="container-wide">
+      <div class="builder-layout">
+
+        <!-- SIDEBAR: TRIP SUMMARY -->
+        <aside class="builder-sidebar glass">
+          <h3><i class="fas fa-suitcase"></i> Trip Summary</h3>
+          <div class="summary-field">
+            <label>Destination</label>
+            <input type="text" id="summaryDest" placeholder="e.g. Paris, France" />
+          </div>
+          <div class="summary-field">
+            <label>Start Date</label>
+            <input type="date" id="summaryStart" />
+          </div>
+          <div class="summary-field">
+            <label>End Date</label>
+            <input type="date" id="summaryEnd" />
+          </div>
+          <div class="summary-field">
+            <label>Travelers</label>
+            <div class="traveler-picker small">
+              <button type="button" class="picker-btn" id="decSb"><i class="fas fa-minus"></i></button>
+              <span id="sbTravelers">2</span>
+              <button type="button" class="picker-btn" id="incSb"><i class="fas fa-plus"></i></button>
+            </div>
+          </div>
+          <div class="summary-stats">
+            <div class="ss-item"><i class="fas fa-calendar-check"></i><span id="totalDays">0 days</span></div>
+            <div class="ss-item"><i class="fas fa-list-check"></i><span id="totalActivities">0 activities</span></div>
+          </div>
+          <button class="btn-primary full-btn" id="saveItineraryBtn">
+            <i class="fas fa-save"></i> Save Itinerary
+          </button>
+          <button class="btn-ghost full-btn" id="clearAllBtn">
+            <i class="fas fa-trash"></i> Clear All
+          </button>
+          <div id="saveSuccess" class="success-toast hidden">
+            <i class="fas fa-check-circle"></i> Itinerary saved!
+          </div>
+        </aside>
+
+        <!-- MAIN TIMELINE -->
+        <div class="builder-content">
+          <div class="builder-toolbar">
+            <h2 id="itineraryTitle">My Trip Itinerary</h2>
+            <button class="btn-primary" id="addDayBtn">
+              <i class="fas fa-plus"></i> Add Day
+            </button>
+          </div>
+
+          <!-- Days container -->
+          <div id="daysContainer">
+            <!-- Day 1 injected by JS -->
+          </div>
+
+          <div class="empty-state" id="emptyState" style="display:none;">
+            <i class="fas fa-map-signs"></i>
+            <p>No days added yet. Click "Add Day" to start building!</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- ACTIVITY MODAL -->
+  <div class="modal-overlay" id="activityModal">
+    <div class="modal glass">
+      <div class="modal-header">
+        <h3><i class="fas fa-plus-circle"></i> Add Activity</h3>
+        <button class="modal-close" id="closeModal"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Activity Name *</label>
+          <input type="text" id="actName" placeholder="e.g. Visit Eiffel Tower" />
+        </div>
+        <div class="form-group">
+          <label>Time</label>
+          <input type="time" id="actTime" value="09:00" />
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select id="actCategory">
+            <option value="sightseeing">🏛 Sightseeing</option>
+            <option value="food">🍽 Food & Dining</option>
+            <option value="adventure">🧗 Adventure</option>
+            <option value="shopping">🛍 Shopping</option>
+            <option value="transport">🚌 Transport</option>
+            <option value="hotel">🏨 Hotel / Stay</option>
+            <option value="culture">🎭 Culture</option>
+            <option value="other">📌 Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Notes</label>
+          <textarea id="actNotes" placeholder="Any special notes or reminders…" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Estimated Cost (USD)</label>
+          <input type="number" id="actCost" placeholder="0" min="0" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-ghost" id="cancelModal">Cancel</button>
+        <button class="btn-primary" id="confirmAddActivity"><i class="fas fa-check"></i> Add Activity</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ITINERARY PICKER MODAL ============ -->
+  <div class="modal-overlay open" id="itineraryPickerModal">
+    <div class="picker-modal">
+      <!-- Header with gradient -->
+      <div class="picker-modal-header">
+        <div class="picker-header-icon"><i class="fas fa-compass"></i></div>
+        <div>
+          <h2>Welcome Back! ✈️</h2>
+          <p>Start fresh or pick up where you left off</p>
+        </div>
+        <button class="picker-close-btn" id="closePickerModal"><i class="fas fa-times"></i></button>
+      </div>
+
+      <div class="picker-modal-body" id="itineraryPickerBody">
+
+        <!-- Start New Card -->
+        <button class="picker-new-card" id="pickerStartNew">
+          <div class="picker-new-card-icon">
+            <i class="fas fa-plus"></i>
+          </div>
+          <div class="picker-new-card-text">
+            <strong>Start New Itinerary</strong>
+            <span>Build a fresh trip from scratch</span>
+          </div>
+          <div class="picker-new-card-arrow">
+            <i class="fas fa-arrow-right"></i>
+          </div>
+        </button>
+
+        <!-- Previous Itineraries -->
+        <div id="previousItinerariesSection" style="display:none;">
+          <div class="picker-section-label">
+            <i class="fas fa-history"></i> Continue a saved trip
+          </div>
+          <div id="previousItinerariesList" class="picker-prev-list">
+            <!-- Injected by JS -->
+          </div>
+        </div>
+
+        <p id="pickerNoSaved" style="display:none;text-align:center;color:var(--text-muted);font-size:0.85rem;padding:0.8rem 0 0.2rem;">
+          <i class="fas fa-info-circle" style="color:var(--teal);margin-right:4px;"></i>
+          No saved itineraries yet — create your first one above!
+        </p>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
